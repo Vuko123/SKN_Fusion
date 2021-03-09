@@ -18,14 +18,14 @@
 
 uint8_t enginesFrame[5];				// Ramka, do ktorej UART wpisuje odbierane dane dot. silnikow
 
-struct EnginesData{						// Struktura przechowujaca skonwertowane dane dla silnikow
+struct EnginesData{					// Struktura przechowujaca skonwertowane dane dla silnikow
 	int multiplier;
 	int leftPower, rightPower;			//wartość 0-9, zmieniana w dalszej części kodu na wartość PWM
-	int leftDirection, rightDirection;	//wartośc 0-1
+	int leftDirection, rightDirection;		//wartośc 0-1
 	}enginesData;
 
-	int rightPower;						//przypisywanie wartości PWM
-	int leftPower;						//Przypisywanie wartości PWM
+	int rightPower;					//przypisywanie wartości PWM
+	int leftPower;					//Przypisywanie wartości PWM
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -90,18 +90,18 @@ int main(void)
   MX_USART2_UART_Init();
   MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
-  HAL_UART_Receive_IT(&huart2, enginesFrame, 5);		// Inicjalizacja odbierania danych przez UART w trybie przerwaniowym
+  HAL_UART_Receive_IT(&huart2, enginesFrame, 5);	// Inicjalizacja odbierania danych przez UART w trybie przerwaniowym
 
-  HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_2);			//Inicjalizacja timerów do PWM
+  HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_2);		//Inicjalizacja timerów do PWM
   HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  while (1)							//M1 - lewy silnik; M2 - prawy silnik
+  while (1)						//M1 - lewy silnik; M2 - prawy silnik
   {
 
-   rightPower=enginesData.rightPower*25;			//zmiana wartości 0-9 wziętej ze struktury na sygnał PWM 0-255 [leftPower, rightPower]
+   rightPower=enginesData.rightPower*25;		//zmiana wartości 0-9 wziętej ze struktury na sygnał PWM 0-255 [leftPower, rightPower]
    leftPower=enginesData.leftPower*25;
 
   if(enginesData.leftDirection==1 && enginesData.rightDirection==0)		//skręt w prawo
@@ -178,15 +178,16 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+
 //część napisana przez Tomka Andrzejewskiego
 
-void convertEnginesFrame(){		// Konwertuje dane do struktury dla silnikow
+void convertEnginesFrame(){				// Konwertuje dane do struktury dla silnikow
 
 	char buffer[2];
 
 	sprintf(buffer, "%c", enginesFrame[0]);		// Przepisanie z uint8_t na char (nie wiem czemu funkcja atoi nie chce konwertowac uint8_t)
 	enginesData.multiplier = atoi(buffer);		// Konwersja i przypisanie wartosci z ramki
-												// Ponizej dokladnie to samo dla reszty zmiennych
+							// Ponizej dokladnie to samo dla reszty zmiennych
 	sprintf(buffer, "%c", enginesFrame[1]);
 	enginesData.leftPower = atoi(buffer);
 
@@ -204,10 +205,10 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart){	// Funkcja wykonywana, 
 
 	uint8_t wiadomosc[8] = "Odebrano";
 
-	if (huart->Instance == USART2){		// Sprawdzenie czy wyslano przez USART1, nie trzeba tego uzywac dopoki uzywamy tylko jednego modulu USART
+	if (huart->Instance == USART2){				// Sprawdzenie czy wyslano przez USART2, nie trzeba tego uzywac dopoki uzywamy tylko jednego modulu USART
 		HAL_UART_Transmit_IT(&huart2, wiadomosc, 8);	// Wyslanie potwierdzenia odebrania danych
-		HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin); // Zmiana stanu pinu na diodzie LED
-		convertEnginesFrame();		// Wywolanie funkcji adresuj�cej odebrane dane do struktury
+		HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin); 	// Zmiana stanu pinu na diodzie LED
+		convertEnginesFrame();				// Wywolanie funkcji adresującej odebrane dane do struktury
 		HAL_UART_Receive_IT(&huart2, enginesFrame, 5);
 	}
 }
