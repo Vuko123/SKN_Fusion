@@ -90,7 +90,7 @@ int main(void)
   MX_USART2_UART_Init();
   MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
-  HAL_UART_Receive_IT(&huart2, enginesFrame, 5);	// Inicjalizacja odbierania danych przez UART w trybie przerwaniowym
+  HAL_UART_Receive_IT(&huart2, enginesFrame, 5);		// Inicjalizacja odbierania danych przez UART w trybie przerwaniowym
 
   HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_2);			//Inicjalizacja timerów do PWM
   HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);
@@ -98,34 +98,35 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  while (1)															 //M1 - lewy silnik; M2 - prawy silnik
+  while (1)							//M1 - lewy silnik; M2 - prawy silnik
   {
 
-	  rightPower=enginesData.rightPower*25;							//zmiana wartości 0-9 wziętej ze struktury na sygnał PWM 0-255 [leftPower, rightPower]
-	  leftPower=enginesData.leftPower*25;
+   rightPower=enginesData.rightPower*25;			//zmiana wartości 0-9 wziętej ze struktury na sygnał PWM 0-255 [leftPower, rightPower]
+   leftPower=enginesData.leftPower*25;
 
-	  if(enginesData.leftDirection==1 && enginesData.rightDirection==0)		//skręt w prawo
-		{
-		 	HAL_GPIO_WritePin(M1_GPIO_Port,M1_Pin,GPIO_PIN_SET);
-		 	HAL_GPIO_WritePin(M2_GPIO_Port,M2_Pin,GPIO_PIN_RESET);			//analogicznie niżej
-		}
-	  else if(enginesData.leftDirection==0 && enginesData.rightDirection==1)	//skręt w lewo
-	  	{
-		  	HAL_GPIO_WritePin(M2_GPIO_Port,M2_Pin,GPIO_PIN_SET);
-		 	HAL_GPIO_WritePin(M1_GPIO_Port,M1_Pin,GPIO_PIN_RESET);
-	  	}
-	  else if(enginesData.leftDirection==1 && enginesData.rightDirection==1) //do przodu
-	  	{
-		 	HAL_GPIO_WritePin(M1_GPIO_Port,M1_Pin,GPIO_PIN_SET);
-		 	HAL_GPIO_WritePin(M2_GPIO_Port,M2_Pin,GPIO_PIN_SET);
-		}
-	  else if(enginesData.leftDirection==0 && enginesData.rightDirection==0) //do tyłu
-		{
-		 	HAL_GPIO_WritePin(M1_GPIO_Port,M1_Pin,GPIO_PIN_RESET);
-		 	HAL_GPIO_WritePin(M2_GPIO_Port,M2_Pin,GPIO_PIN_RESET);
-		}
-	 TIM3->CCR1=rightPower;			//mialo byc bez mnoznikow wiec jest sama wartosc rightPower odebrana z uart
-	 TIM3->CCR2=leftPower;
+  if(enginesData.leftDirection==1 && enginesData.rightDirection==0)		//skręt w prawo
+  {
+	HAL_GPIO_WritePin(M1_GPIO_Port,M1_Pin,GPIO_PIN_SET);
+	HAL_GPIO_WritePin(M2_GPIO_Port,M2_Pin,GPIO_PIN_RESET);			//analogicznie niżej
+  }
+  else if(enginesData.leftDirection==0 && enginesData.rightDirection==1)	//skręt w lewo
+  {
+	HAL_GPIO_WritePin(M2_GPIO_Port,M2_Pin,GPIO_PIN_SET);
+	HAL_GPIO_WritePin(M1_GPIO_Port,M1_Pin,GPIO_PIN_RESET);
+  }
+  else if(enginesData.leftDirection==1 && enginesData.rightDirection==1) 	//do przodu
+  {
+	HAL_GPIO_WritePin(M1_GPIO_Port,M1_Pin,GPIO_PIN_SET);
+	HAL_GPIO_WritePin(M2_GPIO_Port,M2_Pin,GPIO_PIN_SET);
+  }
+  else if(enginesData.leftDirection==0 && enginesData.rightDirection==0) 	//do tyłu
+  {
+	HAL_GPIO_WritePin(M1_GPIO_Port,M1_Pin,GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(M2_GPIO_Port,M2_Pin,GPIO_PIN_RESET);
+  }
+  TIM3->CCR1=rightPower;			//mialo byc bez mnoznikow wiec jest sama wartosc rightPower odebrana z uart
+  TIM3->CCR2=leftPower;
+
 //TODO: Ewentualna optymalizacja
 
     /* USER CODE END WHILE */
