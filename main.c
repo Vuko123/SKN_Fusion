@@ -117,38 +117,35 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)															 //M1 - lewy silnik; M2 - prawy silnik
   {
-
-
 	 rightPower=enginesData.rightPower*25;							//zmiana wartości 0-9 wziętej ze struktury na sygnał PWM 0-255 [leftPower, rightPower]
 	 leftPower=enginesData.leftPower*25;
 
 
-
   if(enginesData.leftDirection==1 && enginesData.rightDirection==0)		//skręt w prawo
-	{
-	 	HAL_GPIO_WritePin(M1_GPIO_Port,M1_Pin,GPIO_PIN_SET);
-	 	HAL_GPIO_WritePin(M2_GPIO_Port,M2_Pin,GPIO_PIN_RESET);			//analogicznie niżej
-	}
+{
+	 HAL_GPIO_WritePin(M1_GPIO_Port,M1_Pin,GPIO_PIN_SET);
+	 HAL_GPIO_WritePin(M2_GPIO_Port,M2_Pin,GPIO_PIN_RESET);			//analogicznie niżej
+}
   else if(enginesData.leftDirection==0 && enginesData.rightDirection==1)	//skręt w lewo
-  	{
-	  	HAL_GPIO_WritePin(M2_GPIO_Port,M2_Pin,GPIO_PIN_SET);
-	 	HAL_GPIO_WritePin(M1_GPIO_Port,M1_Pin,GPIO_PIN_RESET);
-  	}
+  {
+	 HAL_GPIO_WritePin(M2_GPIO_Port,M2_Pin,GPIO_PIN_SET);
+	 HAL_GPIO_WritePin(M1_GPIO_Port,M1_Pin,GPIO_PIN_RESET);
+  }
   else if(enginesData.leftDirection==1 && enginesData.rightDirection==1) //do przodu
-  	{
-	 	HAL_GPIO_WritePin(M1_GPIO_Port,M1_Pin,GPIO_PIN_SET);
-	 	HAL_GPIO_WritePin(M2_GPIO_Port,M2_Pin,GPIO_PIN_SET);
-	}
+  {
+	 HAL_GPIO_WritePin(M1_GPIO_Port,M1_Pin,GPIO_PIN_SET);
+	 HAL_GPIO_WritePin(M2_GPIO_Port,M2_Pin,GPIO_PIN_SET);
+}
   else if(enginesData.leftDirection==0 && enginesData.rightDirection==0) //do tyłu
-	{
-	 	HAL_GPIO_WritePin(M1_GPIO_Port,M1_Pin,GPIO_PIN_RESET);
-	 	HAL_GPIO_WritePin(M2_GPIO_Port,M2_Pin,GPIO_PIN_RESET);
-	}
+{
+	 HAL_GPIO_WritePin(M1_GPIO_Port,M1_Pin,GPIO_PIN_RESET);
+	 HAL_GPIO_WritePin(M2_GPIO_Port,M2_Pin,GPIO_PIN_RESET);
+}
 
-	int RP= TIM3->CCR1=rightPower;			//mialo byc bez mnoznikow wiec jest sama wartosc rightPower odebrana z uart
-	int LP= TIM3->CCR2=leftPower;
- TIM3->CCR1=pid_calculate_1(leftPower, LP);
- TIM3->CCR2=pid_calculate(rightPower, LP);
+int RP= TIM3->CCR1=rightPower;			//mialo byc bez mnoznikow wiec jest sama wartosc rightPower odebrana z UART
+int LP= TIM3->CCR2=leftPower;
+TIM3->CCR1=pid_calculate_1(leftPower, LP);
+TIM3->CCR2=pid_calculate(rightPower, LP);
 
 
 //TODO: Ewentualna optymalizacja
@@ -250,6 +247,7 @@ void pid_init()
 void pid_calculate(int set_val, int read_val)
 {
 	float err_d, u;
+	pid_init();
 
 	pid_params.err = set_val - read_val;
 	pid_params.err_sum += pid_params.err;
@@ -278,6 +276,7 @@ void pid_init_1()
 void pid_calculate_1(int set_val, int read_val)
 {
 	float err_d, u_1;
+	pid_init_1();
 
 	pid_params_1.err = set_val - read_val;
 	pid_params_1.err_sum += pid_params_1.err;
